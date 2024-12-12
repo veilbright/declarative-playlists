@@ -1,0 +1,15 @@
+metadata:
+  name: Test1 # playlist to be created's name
+rules:
+  - subject:
+    - album: Every Open Eye
+      artist: CHVRCHES
+    function: include
+    rules:
+      - subject:
+        - song: Afterglow # search within the rule it's included in, so can be less specific
+        function: exclude
+  - subject:
+    - album: Every Open Eye (Special Edition)
+      song: Bow Down
+    function: include
