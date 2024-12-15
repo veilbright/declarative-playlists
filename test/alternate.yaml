@@ -1,0 +1,15 @@
+name: Alternate Playlist
+description: Whatever you want ig
+add:
+- album: let me be your womb
+  artist: Crywolf
+  remove:
+  - song: tenebrescence [hushed]
+- artist: Crywolf
+  song: FAR LIGHT
+- artist: Pvris
+  remove:
+  - album: F.I.L.T.H.
+  - album: Use Me
+  - album: Use Me (Deluxe)
+  - album: Evergreen
