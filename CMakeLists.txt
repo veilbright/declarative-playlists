@@ -6,17 +6,34 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 include(FetchContent)
 
+# JSON and YAML Parsing
+FetchContent_Declare(
+    json
+    GIT_REPOSITORY https://github.com/nlohmann/json
+    GIT_TAG v3.11.3
+)
 FetchContent_Declare(
     yaml-cpp
     GIT_REPOSITORY https://github.com/jbeder/yaml-cpp
     GIT_TAG 0.8.0
 )
-FetchContent_MakeAvailable(yaml-cpp)
 
-set(src-pattern "src/*.cc")
-file(GLOB dec-cpp-sources ${src-pattern})
+# Crow and Dependencies
+FetchContent_Declare(
+    asio
+    GIT_REPOSITORY https://github.com/chriskohlhoff/asio
+    GIT_TAG asio-1-32-0
+)
+FetchContent_Declare(
+    Crow
+    GIT_REPOSITORY https://github.com/CrowCpp/Crow
+    GIT_TAG v1.2.0
+)
 
-add_executable(${PROJECT_NAME} src/main.cc)
-target_link_libraries(${PROJECT_NAME} PUBLIC yaml-cpp::yaml-cpp)
-target_sources(${PROJECT_NAME} PRIVATE ${dec-cpp-sources})
-target_include_directories(${PROJECT_NAME} PUBLIC "${PROJECT_SOURCE_DIR}/src")
+# For Crow to find asio
+set(ASIO_INCLUDE_DIR "${CMAKE_BINARY_DIR}/_deps/asio-src/asio/include")
+
+FetchContent_MakeAvailable(json yaml-cpp asio Crow)
+
+add_subdirectory(src/client)
+add_subdirectory(src/server)
