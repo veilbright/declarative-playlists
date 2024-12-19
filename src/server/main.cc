@@ -1,10 +1,7 @@
 #include "crow/app.h"
-#include "spotify_authenticator.h"
+#include "spotify_api_requester.h"
+#include "url.h"
 #include <cstdlib>
-#include <vector>
-
-using std::array;
-using std::vector;
 
 // TODO:
 // 1. Create server at requested port on localhost
@@ -18,10 +15,10 @@ void OutputUsage(std::string programName);
 int HandleArgs(int argc, char *argv[]);
 
 int main(int argc, char *argv[]) {
-  vector<unsigned char> verifier = GenPkceVerifier(64);
-  array<unsigned char, 32> sha = Sha256(verifier);
-  vector<unsigned char> base64 =
-      Base64Encode(vector<unsigned char>(sha.begin(), sha.end()));
+  Url url = Url("https://api.spotify.com/v1/"
+                "search?q=remaster%2520track%3ADoxy%2520artist%3AMiles%"
+                "2520Davis&type=album");
+  std::cout << url.to_string() << std::endl;
   /*int port = HandleArgs(argc, argv);*/
   /**/
   /*crow::SimpleApp app;*/
