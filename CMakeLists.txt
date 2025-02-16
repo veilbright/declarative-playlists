@@ -35,5 +35,5 @@ set(ASIO_INCLUDE_DIR "${CMAKE_BINARY_DIR}/_deps/asio-src/asio/include")
 
 FetchContent_MakeAvailable(json yaml-cpp asio Crow)
 
-add_subdirectory(src/client)
+# add_subdirectory(src/client)
 add_subdirectory(src/server)

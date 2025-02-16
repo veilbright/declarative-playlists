@@ -1,7 +1,9 @@
 #include "crow/app.h"
 #include "spotify_api_requester.h"
 #include "url.h"
+#include <asio/impl/write.hpp>
 #include <cstdlib>
+#include <unistd.h>
 
 // TODO:
 // 1. Create server at requested port on localhost
@@ -15,15 +17,14 @@ void OutputUsage(std::string programName);
 int HandleArgs(int argc, char *argv[]);
 
 int main(int argc, char *argv[]) {
-  Url url = Url("https://api.spotify.com/v1/"
-                "search?q=remaster%2520track%3ADoxy%2520artist%3AMiles%"
-                "2520Davis&type=album");
-  std::cout << url.to_string() << std::endl;
-  /*int port = HandleArgs(argc, argv);*/
-  /**/
-  /*crow::SimpleApp app;*/
-  /*CROW_ROUTE(app, "/")([]() { return "Hello World"; });*/
-  /*app.bindaddr("127.0.0.1").port(port).run();*/
+  int port = HandleArgs(argc, argv);
+
+  crow::SimpleApp app;
+  CROW_ROUTE(app, "/")([]() { return "Hello World"; });
+  app.bindaddr("127.0.0.1").port(port).run();
+  SpotifyApiRequester sar = SpotifyApiRequester(
+      "48d0b6760eb940ada50d2b32b1a7d83c", "http://localhost:3000");
+  std::cout << sar.Authenticate().to_string() << std::endl;
 }
 
 // Outputs the correct usage of the application

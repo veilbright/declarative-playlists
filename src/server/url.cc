@@ -4,7 +4,6 @@
 #include <sstream>
 
 using std::ostringstream;
-using std::pair;
 
 // Constructs a URL object from the argument (made up of a base and the params)
 Url::Url(const string &url) {
@@ -44,6 +43,10 @@ Url::Url(const string &url) {
     InsertParam(key, value);
   }
 }
+
+void Url::InsertParam(const string &key, const string &value) {
+  params.insert({key, value});
+};
 
 string Url::to_string() {
   ostringstream url;
