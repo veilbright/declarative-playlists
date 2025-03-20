@@ -6,12 +6,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 include(FetchContent)
 
-# JSON and YAML Parsing
-FetchContent_Declare(
-    json
-    GIT_REPOSITORY https://github.com/nlohmann/json
-    GIT_TAG v3.11.3
-)
+# YAML Parsing
 FetchContent_Declare(
     yaml-cpp
     GIT_REPOSITORY https://github.com/jbeder/yaml-cpp
@@ -22,18 +17,24 @@ FetchContent_Declare(
 FetchContent_Declare(
     asio
     GIT_REPOSITORY https://github.com/chriskohlhoff/asio
-    GIT_TAG asio-1-32-0
+    GIT_TAG asio-1-34-0
 )
 FetchContent_Declare(
     Crow
     GIT_REPOSITORY https://github.com/CrowCpp/Crow
-    GIT_TAG v1.2.0
+    GIT_TAG v1.2.1.2
+)
+
+# C++ Requests
+FetchContent_Declare(
+    cpr
+    GIT_REPOSITORY https://github.com/libcpr/cpr
+    GIT_TAG 1.11.2
 )
 
 # For Crow to find asio
 set(ASIO_INCLUDE_DIR "${CMAKE_BINARY_DIR}/_deps/asio-src/asio/include")
 
-FetchContent_MakeAvailable(json yaml-cpp asio Crow)
+FetchContent_MakeAvailable(yaml-cpp asio Crow cpr)
 
-# add_subdirectory(src/client)
-add_subdirectory(src/server)
+add_subdirectory(src)
