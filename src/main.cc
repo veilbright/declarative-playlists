@@ -1,9 +1,6 @@
-#include "crow/app.h"
-#include "crow/http_request.h"
-#include "spotify_api_requester.h"
-#include "url.h"
-#include <asio/impl/write.hpp>
+#include "spotify_session.h"
 #include <cstdlib>
+#include <iostream>
 #include <unistd.h>
 
 // TODO:
@@ -18,26 +15,9 @@ void OutputUsage(std::string programName);
 int HandleArgs(int argc, char *argv[]);
 
 int main(int argc, char *argv[]) {
-    int port = HandleArgs(argc, argv);
-
-    SpotifyApiRequester sar = SpotifyApiRequester(
-        "7b6c48703e8040d68e090058e0273bbc", "http://localhost:3000");
-    std::cout << "Use the following link to sign into your account: "
-              << sar.GetAuthenticateUrl().to_string() << std::endl;
-
-    // Tiny web server to host redirect URI and capture authCode parameter
-    crow::SimpleApp app;
-    CROW_ROUTE(app, "/")([&sar, &app](const crow::request &req) {
-        sar.auth_code = req.url_params.get("code");
-        if (sar.auth_code.empty()) {
-            std::cout << "Authorization failed due to: "
-                      << req.url_params.get("error");
-        }
-        app.stop();
-        return "You can go back to the terminal now";
-    });
-    app.bindaddr("127.0.0.1").port(port).run();
-    sar.GetAccessToken();
+    SpotifySession spotify_session = SpotifySession("7b6c48703e8040d68e090058e0273bbc", "http://localhost:8989");
+    std::cout << "Use the following link to sign into your account:\n\n" << spotify_session.GetAuthUrl() << std::endl;
+    spotify_session.HostRedirectServer();
 }
 
 // Outputs the correct usage of the application
@@ -57,8 +37,7 @@ int HandleArgs(int argc, char *argv[]) {
     try {
         return std::stoi(argv[1]);
     } catch (const std::exception e) {
-        std::cerr << "ERROR: Failed to convert \"" << argv[1]
-                  << "\" to a valid port number\n";
+        std::cerr << "ERROR: Failed to convert \"" << argv[1] << "\" to a valid port number\n";
         OutputUsage(argv[0]);
         std::exit(EXIT_FAILURE);
     }

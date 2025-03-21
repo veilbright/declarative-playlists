@@ -12,8 +12,11 @@ enum class NodeType { kAdd, kRemove };
 // Parent of all nodes
 class Node {
   public:
-    Node(NodeType type) : type(type) {}
-    NodeType const &get_type() const { return type; }
+    Node(NodeType type) : type(type) {
+    }
+    NodeType const &get_type() const {
+        return type;
+    }
 
   private:
     NodeType type;
@@ -28,7 +31,9 @@ template <typename T> class NodeLevel {
         ConfigAllowedTypes(currentTypes);
     }
     // Constructor to set one allowed type
-    NodeLevel(NodeType type) { allowedChildTypes.insert(type); }
+    NodeLevel(NodeType type) {
+        allowedChildTypes.insert(type);
+    }
 
     // Constructor to build from YAML Node
     NodeLevel(YAML::Node yamlNode, std::unordered_set<NodeType> currentTypes) {
@@ -66,10 +71,18 @@ template <typename T> class NodeLevel {
         }
     }
 
-    std::list<T>::const_iterator const begin() const { return nodes.begin(); }
-    std::list<T>::const_iterator const end() const { return nodes.end(); }
-    std::size_t const size() const { return nodes.size(); }
-    void push_back(T node) { nodes.push_back(node); }
+    std::list<T>::const_iterator const begin() const {
+        return nodes.begin();
+    }
+    std::list<T>::const_iterator const end() const {
+        return nodes.end();
+    }
+    std::size_t const size() const {
+        return nodes.size();
+    }
+    void push_back(T node) {
+        nodes.push_back(node);
+    }
 
   private:
     std::unordered_set<NodeType> allowedChildTypes;
@@ -94,7 +107,7 @@ template <typename T> class NodeLevel {
             s = n.as<std::string>();
         } catch (YAML::BadConversion) {
             // TODO: add logging
-            std::cout << "Bad Conversion to string\n";
+            throw;
         }
     }
 };
@@ -102,12 +115,14 @@ template <typename T> class NodeLevel {
 // Implements functionality for Add and Remove Node classes
 class RuleNode : Node {
   public:
-    RuleNode(NodeType type, RuleSubject subject)
-        : Node(type), subject(subject), rules({type}) {}
+    RuleNode(NodeType type, RuleSubject subject) : Node(type), subject(subject), rules({type}) {
+    }
 
     RuleNode(YAML::Node yamlNode);
 
-    RuleSubject const &get_subject() const { return subject; }
+    RuleSubject const &get_subject() const {
+        return subject;
+    }
     void Output(std::ostream &ost, int level = 0) const;
 
     NodeLevel<RuleNode> rules;
@@ -121,8 +136,8 @@ class RuleNode : Node {
 class BaseRuleNode : Node {
   public:
     BaseRuleNode(std::string name, std::string description)
-        : Node(NodeType::kAdd), name(name), description(description),
-          rules(NodeType::kAdd) {}
+        : Node(NodeType::kAdd), name(name), description(description), rules(NodeType::kAdd) {
+    }
 
     BaseRuleNode(YAML::Node yamlNode);
 
