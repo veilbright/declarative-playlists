@@ -22,14 +22,12 @@ Url::Url(const std::string &url) {
     size_t nextPos = paramStart;
     while (nextPos != url.npos) {
         size_t equalPos = url.find('=', nextPos + 1);
-        if (equalPos ==
-            url.npos) { // shouldn't happen, but we'll go along with it
+        if (equalPos == url.npos) { // shouldn't happen, but we'll go along with it
             // Set key, ignore value
             InsertParam(Decode(url.substr(nextPos + 1)), "");
             break;
         }
-        std::string key =
-            Decode(url.substr(nextPos + 1, equalPos - (nextPos + 1)));
+        std::string key = Decode(url.substr(nextPos + 1, equalPos - (nextPos + 1)));
         std::string value;
 
         nextPos = url.find('&', equalPos);
@@ -45,12 +43,12 @@ Url::Url(const std::string &url) {
 }
 
 void Url::InsertParam(const std::string &key, const std::string &value) {
-    params.insert({key, value});
+    parameters.insert({key, value});
 };
 
 std::string Url::to_string() {
     // only return baseUrl if that's all there is
-    if (params.empty()) {
+    if (parameters.empty()) {
         return get_url_string();
     }
 
@@ -60,14 +58,15 @@ std::string Url::to_string() {
     return url.str();
 }
 
-std::string Url::get_url_string() { return baseUrl; }
+std::string Url::get_url_string() {
+    return baseUrl;
+}
 
 std::string Url::get_params_string() {
     std::ostringstream params_string;
-    for (std::map<std::string, std::string>::const_iterator it = params.begin();
-         it != params.end(); ++it) {
+    for (std::map<std::string, std::string>::const_iterator it = parameters.begin(); it != parameters.end(); ++it) {
         params_string << Encode(it->first) << '=' << Encode(it->second);
-        if (std::next(it) != params.end()) {
+        if (std::next(it) != parameters.end()) {
             params_string << '&';
         }
     }

@@ -25,7 +25,7 @@ class Node {
 // List of nodes and what type of nodes are allowed in the list
 template <typename T> class NodeLevel {
   public:
-    // Contructor to control the types of Rules allowed in the level
+    // Constructor to control the types of Rules allowed in the level
     // Add types allow Remove types, and vice versa
     NodeLevel(std::initializer_list<NodeType> currentTypes) {
         ConfigAllowedTypes(currentTypes);

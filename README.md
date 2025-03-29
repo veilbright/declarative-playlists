@@ -1,11 +1,18 @@
 # Declarative Playlists
 
 ## Development Info
-A project I'm working on to learn more about C++, APIs, and networking. Uses [Crow](https://github.com/CrowCpp/Crow) for the web server, and a [JSON](https://github.com/nlohmann/json) and [YAML](https://github.com/jbeder/yaml-cpp) library to parse their respective formats.
+A project I'm working on to learn more about C++, APIs, and networking. Uses [Crow](https://github.com/CrowCpp/Crow) for the web server, [cpr](https://github.com/libcpr/cpr) for http requests, and a [JSON](https://github.com/nlohmann/json) and [YAML](https://github.com/jbeder/yaml-cpp) library to parse their respective formats.
 
-Currently, the project is split into two components, the client and server. The client right now parses a YAML formatted "declarative playlist" into a tree data structure which will be used to request and organize music requested from Spotify's API. The server currently authorizes a Spotify account using the PKCE authorization flow.
+Currently, the project can authenticate the user using Spotify, and parse a YAML file for a playlist rule tree.
 
 When finished, the project will allow a user to create a YAML or JSON file describing a playlist using rules, which can then be added to their Spotify account.
+
+## To Build
+Run these commands to generate the build files and build the project. The output will be an executable called "DeclarativePlaylists" in the main directory.
+```
+cmake -B build
+cmake --build build
+```
 
 ## Example of Planned Usage
 #### YAML Declared Playlist

@@ -13,6 +13,13 @@ FetchContent_Declare(
     GIT_TAG 0.8.0
 )
 
+# JSON Parsing
+FetchContent_Declare(
+    json
+    GIT_REPOSITORY https://github.com/nlohmann/json
+    GIT_TAG v3.11.3
+)
+
 # Crow and Dependencies
 FetchContent_Declare(
     asio
@@ -35,6 +42,18 @@ FetchContent_Declare(
 # For Crow to find asio
 set(ASIO_INCLUDE_DIR "${CMAKE_BINARY_DIR}/_deps/asio-src/asio/include")
 
-FetchContent_MakeAvailable(yaml-cpp asio Crow cpr)
+FetchContent_MakeAvailable(
+    yaml-cpp
+    json
+    asio
+    Crow
+    cpr
+)
+
+add_executable(${PROJECT_NAME} src/main.cc)
+set_target_properties(
+    ${PROJECT_NAME}
+    PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+)
 
 add_subdirectory(src)

@@ -18,6 +18,7 @@ int main(int argc, char *argv[]) {
     SpotifySession spotify_session = SpotifySession("7b6c48703e8040d68e090058e0273bbc", "http://localhost:8989");
     std::cout << "Use the following link to sign into your account:\n\n" << spotify_session.GetAuthUrl() << std::endl;
     spotify_session.HostRedirectServer();
+    spotify_session.Search();
 }
 
 // Outputs the correct usage of the application

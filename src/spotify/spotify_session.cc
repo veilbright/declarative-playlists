@@ -1,10 +1,14 @@
 #include "spotify_session.h"
 #include "cpr/api.h"
+#include "cpr/auth.h"
 #include "cpr/parameters.h"
 #include "cpr/response.h"
 #include "crow/app.h"
 #include "crow/http_request.h"
 #include "crypto_util.h"
+#include "nlohmann/json.hpp"
+#include "nlohmann/json_fwd.hpp"
+#include "spotify_object.h"
 #include "url.h"
 #include <array>
 #include <crow/json.h>
@@ -17,9 +21,24 @@
 #include <string>
 #include <vector>
 
+const SpotifyTracks SpotifySession::Search() {
+    cpr::Parameters parameters = {{"q", "example"}, {"type", "track"}};
+    nlohmann::json response = RequestAPI("/search", parameters);
+    for (auto it = response.begin(); it != response.end(); ++it) {
+        std::cout << it.key() << ": " << it.value() << std::endl;
+    }
+    return {};
+}
+
+const nlohmann::json SpotifySession::RequestAPI(const std::string url_path, cpr::Parameters &parameters) {
+    cpr::Response response = cpr::Get(cpr::Url(kAPI_URL + url_path), cpr::Bearer(access_token), parameters);
+    std::cout << std::endl << response.text << std::endl << std::endl;
+    return nlohmann::json::parse(response.text);
+}
+
 // Returns the URL to the Spotify authenticator
 // Uses the PKCE flow
-std::string SpotifySession::GetAuthUrl() {
+const std::string SpotifySession::GetAuthUrl() {
     // Generate and save the code verifier
     code_verifier = CryptoUtil::GenPkceVerifier(64);
 
@@ -84,13 +103,13 @@ void SpotifySession::RequestAccessToken() {
                                                              {"redirect_uri", redirect_uri},
                                                              {"client_id", client_id},
                                                              {"code_verifier", code_verifier}});
-    crow::json::rvalue token_json = crow::json::load(token_response.text);
+    nlohmann::json token_json = nlohmann::json::parse(token_response.text);
     if (token_response.status_code != 200) {
         // TODO: better error msg and log (use json from Spotify's response)
         throw std::runtime_error("Received invalid response from Spotify");
     }
-    for (crow::json::rvalue *it = token_json.begin(); it != token_json.end(); ++it) {
-        if (it->key() == "access_token") {
+    for (nlohmann::json::iterator it = token_json.begin(); it != token_json.end(); ++it) {
+        if (it.key() == "access_token") {
             access_token = std::string(*it);
             return;
         }
