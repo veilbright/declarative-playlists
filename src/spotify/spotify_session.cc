@@ -8,7 +8,6 @@
 #include "crypto_util.h"
 #include "nlohmann/json.hpp"
 #include "nlohmann/json_fwd.hpp"
-#include "spotify_object.h"
 #include "url.h"
 #include <array>
 #include <crow/json.h>
@@ -20,15 +19,6 @@
 #include <sstream>
 #include <string>
 #include <vector>
-
-const SpotifyTracks SpotifySession::Search() {
-    cpr::Parameters parameters = {{"q", "example"}, {"type", "track"}};
-    nlohmann::json response = RequestAPI("/search", parameters);
-    for (auto it = response.begin(); it != response.end(); ++it) {
-        std::cout << it.key() << ": " << it.value() << std::endl;
-    }
-    return {};
-}
 
 const nlohmann::json SpotifySession::RequestAPI(const std::string url_path, cpr::Parameters &parameters) {
     cpr::Response response = cpr::Get(cpr::Url(kAPI_URL + url_path), cpr::Bearer(access_token), parameters);

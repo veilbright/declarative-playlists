@@ -3,7 +3,6 @@
 
 #include "cpr/parameters.h"
 #include "nlohmann/json_fwd.hpp"
-#include "spotify_object.h"
 #include "url.h"
 #include <string>
 
@@ -13,7 +12,6 @@ class SpotifySession {
     }
     const std::string GetAuthUrl();
     void HostRedirectServer(); // Host a basic web server to capture responses from Spotify
-    const SpotifyTracks Search();
 
   private:
     void RequestAccessToken(); // set access_token to the value provided by Spotify
