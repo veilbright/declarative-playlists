@@ -26,9 +26,10 @@ class SpotifySession {
     void HostRedirectServer();
 
     nlohmann::json GetUser(); // Returns the current user from Spotify
-    std::string CreatePlaylist(const std::string name, const std::string description, const bool is_public = true,
+    std::string CreatePlaylist(const std::string &name, const std::string &description, const bool is_public = true,
                                const bool collaborative = false) const;
-    nlohmann::json Search(const std::string query, const Type type, const int limit = 1, const int offset = 0) const;
+    std::string AddPlaylistTracks(const std::string &playlist_id, const std::vector<std::string> &track_uris) const;
+    nlohmann::json Search(const std::string &query, const Type type, const int limit = 1, const int offset = 0) const;
     void SetUserId(); // Sets the Session's User ID
 
   private:

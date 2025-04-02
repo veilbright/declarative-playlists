@@ -1,4 +1,17 @@
 name: Test
-description: doesn't matter
+description: Tests the ability to create a playlist and add tracks
 add:
-  - track: Anything > Human
+- track: Anything > Human
+  artist: Bad Omens
+- track: Even
+  artist: Bad Omens
+- track: Concrete Jungle
+  artist: Bad Omens
+- track: Biblical Love
+  artist: Flower Face
+- track: Cornflower Blue
+  artist: Flower Face
+- track: Take Me Back to Eden
+  artist: Sleep Token
+- track: Atlantic
+  artist: Sleep Token

@@ -15,7 +15,6 @@
 #include <crow/json.h>
 #include <cstdio>
 #include <cstdlib>
-#include <exception>
 #include <iostream>
 #include <openssl/sha.h>
 #include <ostream>
@@ -24,7 +23,7 @@
 #include <string>
 #include <vector>
 
-nlohmann::json SpotifySession::Search(const std::string query, const Type type, const int limit,
+nlohmann::json SpotifySession::Search(const std::string &query, const Type type, const int limit,
                                       const int offset) const {
     return RequestAPI("/search", kGet,
                       {{"q", query},
@@ -47,12 +46,18 @@ nlohmann::json SpotifySession::GetUser() {
     return RequestAPI("/me", kGet, {}, {});
 }
 
-std::string SpotifySession::CreatePlaylist(const std::string name, const std::string description, const bool is_public,
-                                           const bool collaborative) const {
+std::string SpotifySession::CreatePlaylist(const std::string &name, const std::string &description,
+                                           const bool is_public, const bool collaborative) const {
     std::string path = "/users/" + user_id + "/playlists";
     return RequestAPI(
         path, kPost, {},
         {{"name", name}, {"description", description}, {"public", is_public}, {"collaborative", collaborative}})["id"];
+}
+
+std::string SpotifySession::AddPlaylistTracks(const std::string &playlist_id,
+                                              const std::vector<std::string> &track_uris) const {
+    std::string path = "/playlists/" + playlist_id + "/tracks";
+    return RequestAPI(path, kPost, {}, {{"uris", nlohmann::json(track_uris)}})["snapshot_id"];
 }
 
 nlohmann::json SpotifySession::RequestAPI(const std::string &url_path, const HttpMethod method,
@@ -74,17 +79,21 @@ nlohmann::json SpotifySession::RequestAPI(const std::string &url_path, const Htt
     nlohmann::json json = nlohmann::json::parse(response.text);
     // TODO: Exceptions cause the program to exit, regardless of catch statements
     // It probably has something to do with CMake or GCC options
-    switch (response.status_code) {
-    case 400:
-        throw BadRequest(json["error"]["message"].template get<std::string>().c_str());
-    case 401:
-        throw Unauthorized(json["error"]["message"].template get<std::string>().c_str());
-    case 403:
-        throw Forbidden(json["error"]["message"].template get<std::string>().c_str());
-    case 404:
-        throw NotFound(json["error"]["message"].template get<std::string>().c_str());
-    case 429:
-        throw TooManyRequests(json["error"]["message"].template get<std::string>().c_str());
+    if (response.status_code != 200 && response.status_code != 201) {
+        std::string message =
+            "Request: " + url.str() + " Error: " + json["error"]["message"].template get<std::string>().c_str();
+        switch (response.status_code) {
+        case 400:
+            throw BadRequest(message.c_str());
+        case 401:
+            throw Unauthorized(message.c_str());
+        case 403:
+            throw Forbidden(message.c_str());
+        case 404:
+            throw NotFound(message.c_str());
+        case 429:
+            throw TooManyRequests(message.c_str());
+        }
     }
     return json;
 }

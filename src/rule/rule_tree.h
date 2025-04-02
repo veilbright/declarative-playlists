@@ -62,7 +62,10 @@ template <typename T> class NodeLevel {
                         TrySetString(subject.album, child["album"]);
                     }
                     if (child["song"]) {
-                        TrySetString(subject.song, child["song"]);
+                        TrySetString(subject.track, child["song"]);
+                    }
+                    if (child["track"]) {
+                        TrySetString(subject.track, child["track"]);
                     }
                     T node = T(type, subject);
                     node.rules = NodeLevel<T>(child, allowedChildTypes);
@@ -123,7 +126,8 @@ class RuleNode : public Node {
     RuleSubject const &get_subject() const {
         return subject;
     }
-    void Output(std::ostream &ost, int level = 0) const; // outputs a readable rule tree to ost
+    void PrintTree(std::ostream &ost, int level = 0) const; // outputs a readable rule tree to ost
+    std::string to_string() const;
     NodeLevel<RuleNode> rules;
 
   private:
@@ -145,7 +149,7 @@ class BaseRuleNode : public Node {
     const std::string &get_description() const {
         return description;
     }
-    void Output(std::ostream &ost) const;
+    void PrintTree(std::ostream &ost) const;
     NodeLevel<RuleNode> rules;
 
   private:
