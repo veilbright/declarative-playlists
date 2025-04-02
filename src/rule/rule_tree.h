@@ -17,6 +17,7 @@ class Node {
     NodeType const &get_type() const {
         return type;
     }
+    void Output(std::ostream &ost, int level = 0) const; // outputs a readable node tree to ost
 
   private:
     NodeType type;
@@ -61,7 +62,10 @@ template <typename T> class NodeLevel {
                         TrySetString(subject.album, child["album"]);
                     }
                     if (child["song"]) {
-                        TrySetString(subject.song, child["song"]);
+                        TrySetString(subject.track, child["song"]);
+                    }
+                    if (child["track"]) {
+                        TrySetString(subject.track, child["track"]);
                     }
                     T node = T(type, subject);
                     node.rules = NodeLevel<T>(child, allowedChildTypes);
@@ -113,18 +117,17 @@ template <typename T> class NodeLevel {
 };
 
 // Implements functionality for Add and Remove Node classes
-class RuleNode : Node {
+class RuleNode : public Node {
   public:
     RuleNode(NodeType type, RuleSubject subject) : Node(type), subject(subject), rules({type}) {
     }
 
-    RuleNode(YAML::Node yamlNode);
-
+    RuleNode(YAML::Node yamlNode); // creates a RuleNode from a YAML node
     RuleSubject const &get_subject() const {
         return subject;
     }
-    void Output(std::ostream &ost, int level = 0) const;
-
+    void PrintTree(std::ostream &ost, int level = 0) const; // outputs a readable rule tree to ost
+    std::string to_string() const;
     NodeLevel<RuleNode> rules;
 
   private:
@@ -132,22 +135,30 @@ class RuleNode : Node {
 };
 
 // Base Node for a tree of Rule Nodes
-// Holds metadata and the top list of rules
-class BaseRuleNode : Node {
+// Holds metadata and the top list of rules, which all must be add
+class BaseRuleNode : public Node {
   public:
     BaseRuleNode(std::string name, std::string description)
         : Node(NodeType::kAdd), name(name), description(description), rules(NodeType::kAdd) {
     }
+    BaseRuleNode(YAML::Node yamlNode); // creates the rule tree for a YAML node
 
-    BaseRuleNode(YAML::Node yamlNode);
-
-    void Output(std::ostream &ost) const;
-
+    const std::string &get_name() const {
+        return name;
+    }
+    const std::string &get_description() const {
+        return description;
+    }
+    void PrintTree(std::ostream &ost) const;
     NodeLevel<RuleNode> rules;
 
   private:
     std::string name;
     std::string description;
 };
+
+// allows the use of the stream operator instead of Output function
+std::ostream &operator<<(std::ostream &ost, const RuleNode &node);
+std::ostream &operator<<(std::ostream &ost, const BaseRuleNode &node);
 
 #endif
