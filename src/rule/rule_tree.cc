@@ -35,12 +35,27 @@ void RuleNode::Output(std::ostream &ost, int level) const {
 
 // Outputs formatted representation of Rule Node
 void BaseRuleNode::Output(std::ostream &ost) const {
+    ost << "Name: " << name << std::endl;
+    ost << "Description: " << description << std::endl;
     for (RuleNode node : rules) {
         node.Output(ost);
     }
 }
 
-BaseRuleNode::BaseRuleNode(YAML::Node yamlNode)
-    : Node(NodeType::kAdd), rules(yamlNode, {get_type()}) {
-    // TODO: set name and description from YAML
+BaseRuleNode::BaseRuleNode(YAML::Node yamlNode) : Node(NodeType::kAdd), rules(yamlNode, {get_type()}) {
+    if (yamlNode["name"]) {
+        name = yamlNode["name"].as<std::string>();
+    }
+    if (yamlNode["description"]) {
+        description = yamlNode["description"].as<std::string>();
+    }
+}
+
+std::ostream &operator<<(std::ostream &os, const RuleNode &node) {
+    node.Output(os);
+    return os;
+}
+std::ostream &operator<<(std::ostream &os, const BaseRuleNode &node) {
+    node.Output(os);
+    return os;
 }

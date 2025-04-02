@@ -1,14 +1,14 @@
-# Declarative Playlists
+# Declists
 
 ## Development Info
 A project I'm working on to learn more about C++, APIs, and networking. Uses [Crow](https://github.com/CrowCpp/Crow) for the web server, [cpr](https://github.com/libcpr/cpr) for http requests, and a [JSON](https://github.com/nlohmann/json) and [YAML](https://github.com/jbeder/yaml-cpp) library to parse their respective formats.
 
-Currently, the project can authenticate the user using Spotify, and parse a YAML file for a playlist rule tree.
+Currently, the project can authenticate the user, search, create a playlist, and parse a YAML file for a playlist rule tree. However, due to limitations on Spotify's API access for in-development applications, only whitelisted accounts can authenticate this app. If you want to run the program, you will need to create your own Spotify application and replace the Client ID in the main file with your own.
 
 When finished, the project will allow a user to create a YAML or JSON file describing a playlist using rules, which can then be added to their Spotify account.
 
 ## To Build
-Run these commands to generate the build files and build the project. The output will be an executable called "DeclarativePlaylists" in the main directory.
+Run these commands to generate the build files and build the project. The output will be an executable called "declists" in the main directory.
 ```
 cmake -B build
 cmake --build build

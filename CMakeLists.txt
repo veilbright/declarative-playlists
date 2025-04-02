@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
-project(DeclarativePlaylists)
+project(declists)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -43,11 +43,11 @@ FetchContent_Declare(
 set(ASIO_INCLUDE_DIR "${CMAKE_BINARY_DIR}/_deps/asio-src/asio/include")
 
 FetchContent_MakeAvailable(
-    yaml-cpp
-    json
     asio
     Crow
     cpr
+    json
+    yaml-cpp
 )
 
 add_executable(${PROJECT_NAME} src/main.cc)

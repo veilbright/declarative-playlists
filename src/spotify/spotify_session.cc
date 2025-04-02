@@ -1,34 +1,97 @@
 #include "spotify_session.h"
 #include "cpr/api.h"
-#include "cpr/auth.h"
+#include "cpr/cprtypes.h"
 #include "cpr/parameters.h"
 #include "cpr/response.h"
 #include "crow/app.h"
 #include "crow/http_request.h"
 #include "crypto_util.h"
+#include "exception.h"
+#include "http_method.h"
 #include "nlohmann/json.hpp"
 #include "nlohmann/json_fwd.hpp"
-#include "url.h"
+#include "util/url.h"
 #include <array>
 #include <crow/json.h>
 #include <cstdio>
 #include <cstdlib>
+#include <exception>
 #include <iostream>
 #include <openssl/sha.h>
 #include <ostream>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
-const nlohmann::json SpotifySession::RequestAPI(const std::string url_path, cpr::Parameters &parameters) {
-    cpr::Response response = cpr::Get(cpr::Url(kAPI_URL + url_path), cpr::Bearer(access_token), parameters);
-    std::cout << std::endl << response.text << std::endl << std::endl;
-    return nlohmann::json::parse(response.text);
+nlohmann::json SpotifySession::Search(const std::string query, const Type type, const int limit,
+                                      const int offset) const {
+    return RequestAPI("/search", kGet,
+                      {{"q", query},
+                       {"type", kTypeString[type]},
+                       {"limit", std::to_string(limit)},
+                       {"offset", std::to_string(offset)}},
+                      {});
+}
+
+void SpotifySession::SetUserId() {
+    try {
+        nlohmann::json user_json = GetUser();
+        user_id = user_json["id"];
+    } catch (const HttpException &e) {
+        std::cout << "Unable to set user_id: " << e.what() << "\n"; // TODO: Log
+    }
+}
+
+nlohmann::json SpotifySession::GetUser() {
+    return RequestAPI("/me", kGet, {}, {});
+}
+
+std::string SpotifySession::CreatePlaylist(const std::string name, const std::string description, const bool is_public,
+                                           const bool collaborative) const {
+    std::string path = "/users/" + user_id + "/playlists";
+    return RequestAPI(
+        path, kPost, {},
+        {{"name", name}, {"description", description}, {"public", is_public}, {"collaborative", collaborative}})["id"];
+}
+
+nlohmann::json SpotifySession::RequestAPI(const std::string &url_path, const HttpMethod method,
+                                          const cpr::Parameters &parameters, const nlohmann::json &body) const {
+    cpr::Response response;
+    cpr::Url url = kAPI_URL + url_path;
+    switch (method) {
+    case kGet:
+        response = cpr::Get(url, cpr::Bearer(access_token), parameters);
+        break;
+    case kPost:
+        response = cpr::Post(url, cpr::Bearer(access_token), cpr::Header({{"Content-Type", "application/json"}}),
+                             cpr::Body(body.dump()));
+        break;
+    case KPut:
+        // TODO: Put request
+        break;
+    }
+    nlohmann::json json = nlohmann::json::parse(response.text);
+    // TODO: Exceptions cause the program to exit, regardless of catch statements
+    // It probably has something to do with CMake or GCC options
+    switch (response.status_code) {
+    case 400:
+        throw BadRequest(json["error"]["message"].template get<std::string>().c_str());
+    case 401:
+        throw Unauthorized(json["error"]["message"].template get<std::string>().c_str());
+    case 403:
+        throw Forbidden(json["error"]["message"].template get<std::string>().c_str());
+    case 404:
+        throw NotFound(json["error"]["message"].template get<std::string>().c_str());
+    case 429:
+        throw TooManyRequests(json["error"]["message"].template get<std::string>().c_str());
+    }
+    return json;
 }
 
 // Returns the URL to the Spotify authenticator
 // Uses the PKCE flow
-const std::string SpotifySession::GetAuthUrl() {
+std::string SpotifySession::GetAuthUrl(std::vector<std::string> scopes) {
     // Generate and save the code verifier
     code_verifier = CryptoUtil::GenPkceVerifier(64);
 
@@ -59,13 +122,19 @@ const std::string SpotifySession::GetAuthUrl() {
         }
     }
 
+    std::ostringstream scope_stream;
+    for (std::string &scope : scopes) {
+        scope_stream << scope << " ";
+    }
+
     // Return the complete URL
     Url userAuthUrl = Url("https://accounts.spotify.com/authorize");
     userAuthUrl.set_params({{"client_id", client_id},
                             {"response_type", "code"},
                             {"redirect_uri", redirect_uri},
                             {"code_challenge_method", "S256"},
-                            {"code_challenge", code_challenge_oss.str()}});
+                            {"code_challenge", code_challenge_oss.str()},
+                            {"scope", scope_stream.str()}});
     return userAuthUrl.to_string();
 }
 
