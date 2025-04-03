@@ -10,14 +10,21 @@
 #include <vector>
 
 int main(int argc, char *argv[]) {
+    // Create rule tree from first argument
+    if (argc < 2) {
+        std::cout << "USAGE: ./declists <dec path>\n";
+        exit(1);
+    }
+    YAML::Node dec_yaml = YAML::LoadFile(argv[1]);
+    BaseRuleNode dec = BaseRuleNode(dec_yaml);
+    std::cout << "Generated Rule Tree:\n" << dec << "\n";
+
+    // Sign the user into Spotify
     SpotifySession spotify_session = SpotifySession("7b6c48703e8040d68e090058e0273bbc", "http://localhost:8989");
-    std::cout << "Use the following link to sign into your account:\n\n"
+    std::cout << "Use the following link to sign into your account:\n"
               << spotify_session.GetAuthUrl({"playlist-modify-public"}) << "\n\n";
     spotify_session.HostRedirectServer();
     spotify_session.SetUserId();
-
-    YAML::Node dec_yaml = YAML::LoadFile("decs/test.yaml");
-    BaseRuleNode dec = BaseRuleNode(dec_yaml);
 
     std::vector<std::string> track_uris;
 
@@ -25,13 +32,18 @@ int main(int argc, char *argv[]) {
         if (!rule.get_subject().track.empty()) {
             std::string search_term = rule.to_string();
             std::cout << "Searching for \"" << search_term << "\"...";
-            nlohmann::json song_json = spotify_session.Search(rule.to_string(), SpotifySession::kTrack);
-            track_uris.push_back(song_json["tracks"]["items"][0]["uri"]);
-            std::cout << "found\n";
+            nlohmann::json track_json = spotify_session.Search(rule.to_string(), SpotifySession::kTrack);
+            if (!track_json["tracks"]["items"][0]["uri"].is_null()) {
+                track_uris.push_back(track_json["tracks"]["items"][0]["uri"]);
+                std::cout << "found\n";
+            } else {
+                exit(2);
+            }
         }
     }
     std::string playlist_id = spotify_session.CreatePlaylist(dec.get_name(), dec.get_description());
     std::cout << "Created playlist: \"" << dec.get_name() << "\"\n";
+    sleep(1);
     spotify_session.AddPlaylistTracks(playlist_id, track_uris);
     std::cout << track_uris.size() << " tracks added to playlist: \"" << dec.get_name() << "\"\n";
 }

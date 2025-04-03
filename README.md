@@ -3,7 +3,7 @@
 ## Development Info
 A project I'm working on to learn more about C++, APIs, and networking. Uses [Crow](https://github.com/CrowCpp/Crow) for the web server, [cpr](https://github.com/libcpr/cpr) for http requests, and a [JSON](https://github.com/nlohmann/json) and [YAML](https://github.com/jbeder/yaml-cpp) library to parse their respective formats.
 
-Currently, the project can authenticate the user, search, create a playlist, and parse a YAML file for a playlist rule tree. However, due to limitations on Spotify's API access for in-development applications, only whitelisted accounts can authenticate this app. If you want to run the program, you will need to create your own Spotify application and replace the Client ID in the main file with your own.
+Currently, the project can authenticate the user, search, create a playlist, and parse a YAML file for a playlist rule tree. However, due to limitations on Spotify's API access for in-development applications, only whitelisted accounts can authorize this app. If you want to run the program, you will need to create your own Spotify application at https://developer.spotify.com and replace the Client ID in the main file with your own.
 
 When finished, the project will allow a user to create a YAML or JSON file describing a playlist using rules, which can then be added to their Spotify account.
 
@@ -13,6 +13,35 @@ Run these commands to generate the build files and build the project. The output
 cmake -B build
 cmake --build build
 ```
+
+## To Run
+Run this command after building the application to execute it. The first argument should be a YAML file with a valid rule tree.
+```
+./declists decs/test.yaml
+```
+
+### Example of Current Usage
+```YAML
+name: Test
+description: Tests the ability to create a playlist and add tracks
+add:
+- track: Anything > Human
+  artist: Bad Omens
+- track: Even
+  artist: Bad Omens
+- track: Concrete Jungle
+  artist: Bad Omens
+- track: Biblical Love
+  artist: Flower Face
+- track: Cornflower Blue
+  album: The Shark in Your Water
+  artist: Flower Face
+- track: Take Me Back to Eden
+  artist: Sleep Token
+- track: Atlantic
+  album: This Place Will Become Your Tomb
+```
+This file will create a playlist in Spotify with the supplied name and description. It then will search for and add songs based on the provided tracks, albums, and artists.
 
 ## Example of Planned Usage
 #### YAML Declared Playlist
@@ -40,10 +69,10 @@ If multiple specifiers are given for one item, the app will use the less specifi
 ```
 will look for any song called "PERFECT ANGEL", while this:
 ```YAML
-- song: PERFECT ANGEL
+- track: PERFECT ANGEL
   artist: Banshee
 ```
-will only return songs by Banshee called "PERFECT ANGEL". The qualifiers can be in any order.
+will only return songs by Banshee called "PERFECT ANGEL". The qualifiers can be in any order, and track and song are interchangeable.
 
 The other rule that can be used while declaring a playlist is 'remove'. This will remove songs added in parent rules. For example:
 ```YAML

@@ -8,6 +8,7 @@
 #include "crypto_util.h"
 #include "exception.h"
 #include "http_method.h"
+#include "nlohmann/detail/exceptions.hpp"
 #include "nlohmann/json.hpp"
 #include "nlohmann/json_fwd.hpp"
 #include "util/url.h"
@@ -39,6 +40,12 @@ void SpotifySession::SetUserId() {
         user_id = user_json["id"];
     } catch (const HttpException &e) {
         std::cout << "Unable to set user_id: " << e.what() << "\n"; // TODO: Log
+    } catch (const nlohmann::detail::type_error &e) {
+        std::cout
+            << "\nFailed to get user ID. This could be due to the app still being in development mode. If you want to "
+               "access the full functionality, you can create a Spotify application at https://developer.spotify.com, "
+               "and replace the Client ID in the main file with your own.\n"; // TODO: Log
+        exit(2);
     }
 }
 
@@ -76,12 +83,17 @@ nlohmann::json SpotifySession::RequestAPI(const std::string &url_path, const Htt
         // TODO: Put request
         break;
     }
-    nlohmann::json json = nlohmann::json::parse(response.text);
-    // TODO: Exceptions cause the program to exit, regardless of catch statements
-    // It probably has something to do with CMake or GCC options
+    nlohmann::json response_json;
+    try {
+        response_json = nlohmann::json::parse(response.text);
+    } catch (const nlohmann::detail::parse_error &) {
+        std::cout << "Request: " << url.str() << "\nError: " << response.text << "\n"; // TODO: Log
+        return {};
+    }
     if (response.status_code != 200 && response.status_code != 201) {
-        std::string message =
-            "Request: " + url.str() + " Error: " + json["error"]["message"].template get<std::string>().c_str();
+        std::string message = "Request: " + url.str() +
+                              "\nError: " + response_json["error"]["message"].template get<std::string>().c_str() +
+                              "\n";
         switch (response.status_code) {
         case 400:
             throw BadRequest(message.c_str());
@@ -95,7 +107,7 @@ nlohmann::json SpotifySession::RequestAPI(const std::string &url_path, const Htt
             throw TooManyRequests(message.c_str());
         }
     }
-    return json;
+    return response_json;
 }
 
 // Returns the URL to the Spotify authenticator
