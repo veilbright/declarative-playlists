@@ -3,9 +3,9 @@
 
 #include "cpr/parameters.h"
 #include "http_method.h"
-#include "nlohmann/json_fwd.hpp"
-#include <exception>
+#include "nlohmann/json.hpp"
 #include <string>
+#include <vector>
 
 class SpotifySession {
   public:

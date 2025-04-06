@@ -1,16 +1,17 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 4.0)
 project(declists)
 
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 include(FetchContent)
 
-# YAML Parsing
+# YAML Parsing (newest versioned release uses CMake 3.4, which is too old)
 FetchContent_Declare(
     yaml-cpp
     GIT_REPOSITORY https://github.com/jbeder/yaml-cpp
-    GIT_TAG 0.8.0
+    GIT_TAG 28f93bdec6387d42332220afa9558060c8016795
 )
 
 # JSON Parsing
@@ -32,6 +33,9 @@ FetchContent_Declare(
     GIT_TAG v1.2.1.2
 )
 
+# For Crow to find asio
+set(ASIO_INCLUDE_DIR "${CMAKE_BINARY_DIR}/_deps/asio-src/asio/include")
+
 # C++ Requests
 FetchContent_Declare(
     cpr
@@ -39,8 +43,12 @@ FetchContent_Declare(
     GIT_TAG 1.11.2
 )
 
-# For Crow to find asio
-set(ASIO_INCLUDE_DIR "${CMAKE_BINARY_DIR}/_deps/asio-src/asio/include")
+# GoogleTest
+FetchContent_Declare(
+    googletest
+    GIT_REPOSITORY https://github.com/google/googletest
+    GIT_TAG v1.16.0
+)
 
 FetchContent_MakeAvailable(
     asio
@@ -48,12 +56,12 @@ FetchContent_MakeAvailable(
     cpr
     json
     yaml-cpp
+    googletest
 )
 
 add_executable(${PROJECT_NAME} src/main.cc)
-set_target_properties(
-    ${PROJECT_NAME}
-    PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-)
 
 add_subdirectory(src)
+
+enable_testing()
+add_subdirectory(test)

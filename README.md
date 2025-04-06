@@ -1,22 +1,23 @@
 # Declists
 
 ## Development Info
-A project I'm working on to learn more about C++, APIs, and networking. Uses [Crow](https://github.com/CrowCpp/Crow) for the web server, [cpr](https://github.com/libcpr/cpr) for http requests, and a [JSON](https://github.com/nlohmann/json) and [YAML](https://github.com/jbeder/yaml-cpp) library to parse their respective formats.
+A project I'm working on to learn more about C++, APIs, and testing. Uses [Crow](https://github.com/CrowCpp/Crow) for a web server, [cpr](https://github.com/libcpr/cpr) for http requests, and a [JSON](https://github.com/nlohmann/json) and [YAML](https://github.com/jbeder/yaml-cpp) library to parse their respective formats. Also uses [GoogleTest](https://github.com/google/googletest) as the testing framework.
 
 Currently, the project can authenticate the user, search, create a playlist, and parse a YAML file for a playlist rule tree. However, due to limitations on Spotify's API access for in-development applications, only whitelisted accounts can authorize this app. If you want to run the program, you will need to create your own Spotify application at https://developer.spotify.com and replace the Client ID in the main file with your own.
 
 When finished, the project will allow a user to create a YAML or JSON file describing a playlist using rules, which can then be added to their Spotify account.
 
 ## To Build
-Run these commands to generate the build files and build the project. The output will be an executable called "declists" in the main directory.
-```
+Run these commands to generate the build files and build the project. The output will be an executable called "declists" in the build directory.
+```Bash
 cmake -B build
-cmake --build build
+cd build
+cmake --build .
 ```
 
 ## To Run
 Run this command after building the application to execute it. The first argument should be a YAML file with a valid rule tree.
-```
+```Bash
 ./declists decs/test.yaml
 ```
 
@@ -42,6 +43,12 @@ add:
   album: This Place Will Become Your Tomb
 ```
 This file will create a playlist in Spotify with the supplied name and description. It then will search for and add songs based on the provided tracks, albums, and artists.
+
+## Testing
+Currently, the *crypto* library has unit tests for every function. To run the tests, build the application and run the following command in the build directory.
+```Bash
+ctest
+```
 
 ## Example of Planned Usage
 #### YAML Declared Playlist

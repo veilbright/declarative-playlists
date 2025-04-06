@@ -1,3 +1,4 @@
+#include "nlohmann/json_fwd.hpp"
 #include "rule_tree.h"
 #include "spotify_session.h"
 #include "yaml-cpp/node/node.h"
@@ -43,7 +44,7 @@ int main(int argc, char *argv[]) {
     }
     std::string playlist_id = spotify_session.CreatePlaylist(dec.get_name(), dec.get_description());
     std::cout << "Created playlist: \"" << dec.get_name() << "\"\n";
-    sleep(1);
+    sleep(2);
     spotify_session.AddPlaylistTracks(playlist_id, track_uris);
     std::cout << track_uris.size() << " tracks added to playlist: \"" << dec.get_name() << "\"\n";
 }

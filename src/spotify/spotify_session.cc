@@ -11,7 +11,7 @@
 #include "nlohmann/detail/exceptions.hpp"
 #include "nlohmann/json.hpp"
 #include "nlohmann/json_fwd.hpp"
-#include "util/url.h"
+#include "url.h"
 #include <array>
 #include <crow/json.h>
 #include <cstdio>
@@ -117,9 +117,7 @@ std::string SpotifySession::GetAuthUrl(std::vector<std::string> scopes) {
     code_verifier = CryptoUtil::GenPkceVerifier(64);
 
     // Hash the PKCE code verifier using SHA256
-    std::array<unsigned char, 32> code_verifier_sha; // 32 is size of SHA256 output
-    SHA256(reinterpret_cast<const unsigned char *>(code_verifier.c_str()), code_verifier.length(),
-           code_verifier_sha.data());
+    std::array<unsigned char, 32> code_verifier_sha = CryptoUtil::Sha256(code_verifier);
 
     // Base64 encode the hash
     std::vector<unsigned char> code_challenge_vec =
