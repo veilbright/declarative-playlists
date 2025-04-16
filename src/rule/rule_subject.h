@@ -1,8 +1,13 @@
+#ifndef RULE_RULE_SUBJECT
+#define RULE_RULE_SUBJECT
+
 #include <string>
 
-typedef struct RuleSubject {
+struct RuleSubject {
     std::string artist;
     std::string album;
     std::string track;
     std::string uri;
-} RuleSubject;
+};
+
+#endif

@@ -1,8 +1,7 @@
+#include "base_rule_node.h"
 #include "nlohmann/json_fwd.hpp"
-#include "rule_tree.h"
 #include "spotify_session.h"
-#include "yaml-cpp/node/node.h"
-#include "yaml-cpp/node/parse.h"
+#include "yaml-cpp/yaml.h"
 #include <cstdlib>
 #include <iostream>
 #include <nlohmann/json.hpp>

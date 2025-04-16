@@ -10,7 +10,7 @@ When finished, the project will allow a user to create a YAML or JSON file descr
 
 ## To Build
 
-Run these commands from the project's root director to generate the build files and build the project. The output will be an executable called "declists" in the build directory.
+Run these commands from the project's root director to generate the build files and build the project. The output will be an executable called "declists" in the build directory. All of the dependencies will be downloaded from Github, except for [OpenSSL](https://www.openssl.org/).
 
 ```Bash
 cmake -B build

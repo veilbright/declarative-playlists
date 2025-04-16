@@ -1,0 +1,4 @@
+add_executable(test_rule_node rule_node_test.cc)
+target_link_libraries(test_rule_node GTest::gtest_main)
+target_link_libraries(test_rule_node rule)
+gtest_discover_tests(test_rule_node)
