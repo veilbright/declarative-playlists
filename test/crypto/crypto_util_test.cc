@@ -1,4 +1,4 @@
-#include "../src/crypto/crypto_util.h"
+#include "../../src/crypto/crypto_util.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include <cstdint>

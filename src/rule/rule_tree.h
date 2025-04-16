@@ -17,7 +17,6 @@ class Node {
     NodeType const &get_type() const {
         return type;
     }
-    void Output(std::ostream &ost, int level = 0) const; // outputs a readable node tree to ost
 
   private:
     NodeType type;

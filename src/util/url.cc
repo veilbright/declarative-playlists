@@ -46,7 +46,7 @@ void Url::InsertParam(const std::string &key, const std::string &value) {
     parameters.insert({key, value});
 };
 
-std::string Url::to_string() {
+std::string Url::to_string() const {
     // only return baseUrl if that's all there is
     if (parameters.empty()) {
         return get_url_string();
@@ -58,11 +58,11 @@ std::string Url::to_string() {
     return url.str();
 }
 
-std::string Url::get_url_string() {
+std::string Url::get_url_string() const {
     return baseUrl;
 }
 
-std::string Url::get_params_string() {
+std::string Url::get_params_string() const {
     std::ostringstream params_string;
     for (std::map<std::string, std::string>::const_iterator it = parameters.begin(); it != parameters.end(); ++it) {
         params_string << Encode(it->first) << '=' << Encode(it->second);
@@ -74,7 +74,7 @@ std::string Url::get_params_string() {
 }
 
 // Simple encoding, converts disallowed chars to %XX
-std::string Url::Encode(const std::string &str) {
+std::string Url::Encode(const std::string &str) const {
     std::ostringstream ss;
     for (char c : str) {
         if (isalnum(c) || c == '_' || c == '~' || c == '.' || c == '-') {
@@ -89,7 +89,7 @@ std::string Url::Encode(const std::string &str) {
 }
 
 // Simple decoding, converts %XX to char
-std::string Url::Decode(const std::string &str) {
+std::string Url::Decode(const std::string &str) const {
     std::ostringstream ss;
     for (int i = 0; i < str.size(); ++i) {
         if (str[i] != '%') {
