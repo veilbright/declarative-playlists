@@ -1,5 +1,44 @@
-#include "rule_tree.h"
+#include "rule_node.h"
+#include "node_type.h"
+#include "yaml-cpp/yaml.h"
 #include <sstream>
+
+// Constructor to build from YAML Node
+RuleNode::RuleNode(const YAML::Node yamlNode, const NodeType type, const std::unordered_set<NodeType> bannedTypes)
+    : Node(type), bannedTypes(bannedTypes) {
+    for (const auto &[map_type, map_string] : NodeTypeStrings::map) {
+        if (bannedTypes.contains(map_type)) { // skip any banned child types
+            continue;
+        }
+        YAML::Node nodeSequence = yamlNode[map_string]; // go into the section "add" or "remove"
+        for (YAML::Node const &child : nodeSequence) {  // iterate through the section for subject definitions
+            if (child["artist"]) {
+                TrySetString(subject.artist, child["artist"]);
+            }
+            if (child["album"]) {
+                TrySetString(subject.album, child["album"]);
+            }
+            if (child["song"]) {
+                TrySetString(subject.track, child["song"]);
+            }
+            if (child["track"]) {
+                TrySetString(subject.track, child["track"]);
+            }
+            RuleNode node = RuleNode(type, subject);
+            rules.push_back(node);
+        }
+    }
+};
+
+// Used when setting subject fields for new nodes
+void RuleNode::TrySetString(std::string &s, const YAML::Node &n) {
+    try {
+        s = n.as<std::string>();
+    } catch (YAML::BadConversion) {
+        // TODO: add logging
+        throw;
+    }
+}
 
 // Outputs formatted representation of Rule Node
 void RuleNode::PrintTree(std::ostream &ost, int level) const {
@@ -34,15 +73,6 @@ void RuleNode::PrintTree(std::ostream &ost, int level) const {
     }
 }
 
-// Outputs formatted representation of Rule Node
-void BaseRuleNode::PrintTree(std::ostream &ost) const {
-    ost << "Name: " << name << std::endl;
-    ost << "Description: " << description << std::endl;
-    for (RuleNode node : rules) {
-        node.PrintTree(ost);
-    }
-}
-
 std::string RuleNode::to_string() const {
     bool is_artist = !get_subject().artist.empty();
     bool is_album = !get_subject().album.empty();
@@ -66,20 +96,7 @@ std::string RuleNode::to_string() const {
     return ss.str();
 }
 
-BaseRuleNode::BaseRuleNode(YAML::Node yamlNode) : Node(NodeType::kAdd), rules(yamlNode, {get_type()}) {
-    if (yamlNode["name"]) {
-        name = yamlNode["name"].as<std::string>();
-    }
-    if (yamlNode["description"]) {
-        description = yamlNode["description"].as<std::string>();
-    }
-}
-
 std::ostream &operator<<(std::ostream &os, const RuleNode &node) {
-    node.PrintTree(os);
-    return os;
-}
-std::ostream &operator<<(std::ostream &os, const BaseRuleNode &node) {
     node.PrintTree(os);
     return os;
 }
