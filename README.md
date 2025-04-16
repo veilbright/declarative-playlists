@@ -23,7 +23,7 @@ cmake --build .
 Run this command after building the application to execute it. The first argument should be a YAML file with a valid rule tree.
 
 ```Bash
-./declists decs/test.yaml
+./declists ../decs/test.yaml
 ```
 
 ### Example of Current Usage
