@@ -5,8 +5,8 @@
 
 class NodeTest : public testing::Test {
   protected:
-    Node addNode = Node(NodeType::kAdd);
-    Node removeNode = Node(NodeType::kRemove);
+    RuleNode addNode = RuleNode(NodeType::kAdd);
+    RuleNode removeNode = RuleNode(NodeType::kRemove);
 };
 
 TEST_F(NodeTest, ConstructorWorks) {

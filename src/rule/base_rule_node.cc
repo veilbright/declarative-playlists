@@ -11,13 +11,19 @@ void BaseRuleNode::PrintTree(std::ostream &ost) const {
     }
 }
 
-BaseRuleNode::BaseRuleNode(YAML::Node yamlNode) : RuleNode(yamlNode, NodeType::kAdd, {NodeType::kRemove}) {
+BaseRuleNode::BaseRuleNode(YAML::Node yamlNode) {
     if (yamlNode["name"]) {
         name = yamlNode["name"].as<std::string>();
     }
     if (yamlNode["description"]) {
         description = yamlNode["description"].as<std::string>();
     }
+    if (yamlNode["add"]) {
+        for (YAML::Node const &subjectNode : yamlNode["add"]) {
+            rules.push_back(RuleNode(subjectNode, NodeType::kAdd)); // TODO: add banned types
+        }
+    }
+    RuleNode(yamlNode["add"], NodeType::kAdd, {NodeType::kRemove});
 }
 
 std::ostream &operator<<(std::ostream &os, const BaseRuleNode &node) {

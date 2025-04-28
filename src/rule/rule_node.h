@@ -1,7 +1,6 @@
 #ifndef RULE_RULE_LEVEL
 #define RULE_RULE_LEVEL
 
-#include "node.h"
 #include "node_type.h"
 #include "rule_subject.h"
 #include "yaml-cpp/node/node.h"
@@ -9,9 +8,9 @@
 #include <unordered_set>
 
 // Implements functionality for Add and Remove Node classes
-class RuleNode : public Node {
+class RuleNode {
   public:
-    RuleNode(const NodeType type, const RuleSubject subject) : Node(type), subject(subject) {
+    RuleNode(const NodeType type, const RuleSubject subject) : type(type), subject(subject) {
     }
 
     RuleNode(const NodeType type) : RuleNode(type, {}) {
@@ -24,6 +23,9 @@ class RuleNode : public Node {
     RuleNode(const YAML::Node yamlNode, const NodeType type) : RuleNode(yamlNode, type, {}) {
     }
 
+    NodeType const &get_type() const {
+        return type;
+    }
     RuleSubject const &get_subject() const {
         return subject;
     }
@@ -34,6 +36,7 @@ class RuleNode : public Node {
 
   private:
     RuleSubject subject;
+    NodeType type;
     std::unordered_set<NodeType> bannedTypes;
 
     // Used when setting subject fields for new nodes

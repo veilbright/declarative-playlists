@@ -1,31 +1,34 @@
 #include "rule_node.h"
 #include "node_type.h"
+#include "rule_subject.h"
+#include "yaml-cpp/node/node.h"
+#include "yaml-cpp/node/type.h"
 #include "yaml-cpp/yaml.h"
 #include <sstream>
 
 // Constructor to build from YAML Node
 RuleNode::RuleNode(const YAML::Node yamlNode, const NodeType type, const std::unordered_set<NodeType> bannedTypes)
-    : Node(type), bannedTypes(bannedTypes) {
+    : type(type), bannedTypes(bannedTypes) {
+    if (yamlNode["artist"]) {
+        TrySetString(subject.artist, yamlNode["artist"]);
+    }
+    if (yamlNode["album"]) {
+        TrySetString(subject.album, yamlNode["album"]);
+    }
+    if (yamlNode["song"]) {
+        TrySetString(subject.track, yamlNode["song"]);
+    }
+    if (yamlNode["track"]) {
+        TrySetString(subject.track, yamlNode["track"]);
+    }
     for (const auto &[map_type, map_string] : NodeTypeStrings::map) {
         if (bannedTypes.contains(map_type)) { // skip any banned child types
             continue;
         }
-        YAML::Node nodeSequence = yamlNode[map_string]; // go into the section "add" or "remove"
-        for (YAML::Node const &child : nodeSequence) {  // iterate through the section for subject definitions
-            if (child["artist"]) {
-                TrySetString(subject.artist, child["artist"]);
+        if (yamlNode[map_string]) {
+            for (YAML::Node const &subjectNode : yamlNode[map_string]) {
+                rules.push_back(RuleNode(subjectNode, map_type));
             }
-            if (child["album"]) {
-                TrySetString(subject.album, child["album"]);
-            }
-            if (child["song"]) {
-                TrySetString(subject.track, child["song"]);
-            }
-            if (child["track"]) {
-                TrySetString(subject.track, child["track"]);
-            }
-            RuleNode node = RuleNode(type, subject);
-            rules.push_back(node);
         }
     }
 };

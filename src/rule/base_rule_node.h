@@ -3,13 +3,13 @@
 
 #include "rule_node.h"
 #include "yaml-cpp/node/node.h"
+#include <vector>
 
 // Base Node for a tree of Rule Nodes
 // Holds metadata and the top list of rules, which all must be add
-class BaseRuleNode : public RuleNode {
+class BaseRuleNode {
   public:
-    BaseRuleNode(std::string name, std::string description)
-        : RuleNode(NodeType::kAdd), name(name), description(description) {
+    BaseRuleNode(std::string name, std::string description) {
     }
 
     BaseRuleNode(YAML::Node yamlNode); // creates the rule tree for a YAML node
@@ -22,6 +22,7 @@ class BaseRuleNode : public RuleNode {
     }
 
     void PrintTree(std::ostream &ost) const;
+    std::vector<RuleNode> rules;
 
   private:
     std::string name;
